@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jujutsu Kaisen Roleplay - Gojo Satoru & Omie Hoshino</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --chat-bg: #1e293b;
+            --gojo-blue: #38bdf8;
+            --omie-gold: #f59e0b;
+            --text-light: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+
+        /* Main Container */
+        .app-container { width: 100%; max-width: 900px; height: 100vh; display: flex; flex-direction: column; background: var(--chat-bg); position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        /* Header */
+        header { background: #0f172a; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; }
+        .char-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gojo-blue); object-fit: cover; }
+        .status { font-size: 0.8rem; color: #4ade80; }
+
+        /* Menu Button (...) */
+        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 5px 10px; border-radius: 5px; }
+        .menu-btn:hover { background: #334155; }
+        
+        .dropdown-menu { display: none; position: absolute; top: 60px; right: 20px; background: #1e293b; border: 1px solid #475569; border-radius: 8px; z-index: 100; width: 220px; box-shadow: 0 10px 15px rgba(0,0,0,0.5); }
+        .dropdown-menu div { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #334155; transition: 0.2s; }
+        .dropdown-menu div:hover { background: #334155; color: var(--gojo-blue); }
+
+        /* Chat Area */
+        .chat-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 12px; line-height: 1.5; font-size: 0.95rem; white-space: pre-wrap; }
+        .msg-gojo { background: #0284c7; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-omie { background: #d97706; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-system { background: #334155; align-self: center; text-align: center; font-style: italic; font-size: 0.85rem; max-width: 90%; color: #cbd5e1; }
+
+        /* Input Area */
+        .input-area { padding: 15px; background: #0f172a; display: flex; gap: 10px; border-top: 1px solid #334155; }
+        textarea { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 10px; color: white; resize: none; height: 45px; outline: none; }
+        button.send-btn { background: var(--gojo-blue); border: none; color: black; font-weight: bold; padding: 0 20px; border-radius: 8px; cursor: pointer; }
+
+        /* Smartphone Modal UI */
+        .phone-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
+        .phone-frame { width: 360px; height: 700px; background: #000; border-radius: 40px; border: 4px solid #475569; display: flex; flex-direction: column; overflow: hidden; position: relative; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+        .phone-header { background: #111; padding: 10px 20px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; border-bottom: 1px solid #222; }
+        .phone-content { flex: 1; background: #121212; overflow-y: auto; color: white; padding: 15px; }
+        .close-phone { position: absolute; top: 10px; right: 15px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-weight: bold; z-index: 10; }
+
+        /* App Layouts inside Phone */
+        .app-tabs { display: flex; justify-content: space-around; background: #1e1e1e; padding: 10px 0; border-top: 1px solid #333; }
+        .app-tab-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 0.75rem; }
+        .app-tab-btn.active { color: var(--gojo-blue); font-weight: bold; }
+
+        .app-screen { display: none; }
+        .app-screen.active { display: block; }
+
+        /* Cards & UI Elements */
+        .card { background: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #2a2a2a; }
+        .bank-balance { font-size: 1.5rem; color: #4ade80; font-weight: bold; margin: 10px 0; }
+        .notification { background: #3b82f6; color: white; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <header>
+        <div class="char-info">
+            <img src="https://i.pinimg.com/564x/87/42/17/87421711e7ef7b98967b57fa0c9eb3ff.jpg" alt="Gojo Satoru" class="avatar">
+            <div>
+                <h3>Gojo Satoru (Chú Thuật Sư Mạnh Nhất)</h3>
+                <span class="status">● Đang hoạt động | Năm 2018</span>
+            </div>
+        </div>
+        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+    </header>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div onclick="openPhone('gojo')">📱 Điện thoại Gojo Satoru</div>
+        <div onclick="openPhone('omie')">📱 Điện thoại Omie Hoshino</div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area" id="chatArea">
+        <div class="msg msg-system">
+            [Bối cảnh: Năm 2018 - Lớp học Trường Chú Thuật Tokyo sau nhiệm vụ ở Roppongi]
+            <br>Yuji, Megumi và Nobara đang ngồi trong lớp. Nobara vẫn liên tục phàn nàn về thái độ của Megumi, Yuji tò mò hỏi lung tung, còn Megumi thì thở dài ngán ngẩm...
+        </div>
+
+        <div class="msg msg-gojo">
+            Này mấy đứa~ Tập trung thầy giới thiệu học sinh mới nè! ✨✨
+        </div>
+
+        <div class="msg msg-system">
+            Cánh cửa lớp học mở ra. Một thiếu nữ sở hữu mái tóc vàng óng gợn sóng dài tới lưng, đôi mắt màu xanh ngọc lục bảo trong trẻo như thiên thần bước vào. Dù mặc đồng phục chú thuật đã được chỉnh sửa vừa vặn, ở cô vẫn toát lên khí chất tiểu thư đài các, sang chảnh nhưng ánh mắt lại chứa đầy sự tinh nghịch.
+            <br><br>
+            Kugisaki Nobara đơ người ngơ ngác vì vẻ đẹp lung linh. Itadori Yuji mắt sáng rỡ. Fushiguro Megumi khẽ nhíu mày nghi vấn vì nguồn chú lực quanh cô... cực kỳ thuần khiết và khác lạ.
+        </div>
+
+        <div class="msg msg-gojo">
+            Nào~ Giới thiệu về mình đi nào học sinh mới! /gương mặt hồ hởi, giọng nói đầy vui vẻ/
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <textarea id="userInput" placeholder="Nhập câu trả lời hoặc hành động của Omie Hoshino..."></textarea>
+        <button class="send-btn" onclick="sendMessage()">Gửi</button>
+    </div>
+</div>
+
+<!-- Virtual Smartphone Modal -->
+<div class="phone-modal" id="phoneModal">
+    <div class="phone-frame">
+        <button class="close-phone" onclick="closePhone()">✕</button>
+        <div class="phone-header">
+            <span id="phoneOwner">Điện thoại</span>
+            <span>12:00 PM | 100% 🔋</span>
+        </div>
+        
+        <div class="phone-content" id="phoneContent">
+            <!-- Dynamic Content loaded by JS -->
+        </div>
+
+        <div class="app-tabs">
+            <button class="app-tab-btn active" onclick="switchApp('line')">LINE</button>
+            <button class="app-tab-btn" onclick="switchApp('insta')">Instagram</button>
+            <button class="app-tab-btn" onclick="switchApp('bank')">Bank</button>
+            <button class="app-tab-btn" onclick="switchApp('album')">Album</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // System Data
+    let currentPhoneOwner = '';
+    let currentApp = 'line';
+
+    const phoneData = {
+        gojo: {
+            name: "Gojo Satoru's iPhone 10 Pro",
+            line: [
+                { name: "Yaga Principal", msg: "Satoru, báo cáo nhiệm vụ Roppongi đâu?", time: "10:30" },
+                { name: "Geto Suguru", msg: "Lâu rồi không gặp...", time: "Hôm qua" },
+                { name: "Megumi Fushiguro", msg: "Thầy đừng mua bánh ngọt bắt em xách nữa.", time: "08:15" },
+                { name: "Lão già Gia Tộc Gojo", msg: "Hôn ước với tiểu thư Hoshino đã thu xếp xong, cậu hãy chú ý.", time: "Tuần trước" }
+            ],
+            insta: {
+                user: "@strongest_satoru",
+                posts: ["Ảnh chụp Kikufuku nhân đậu đỏ 🍡", "Ảnh dìm Megumi đang ngủ 😴"],
+                notifications: ["@nobara_kugi đã thích ảnh của bạn", "@kaito_hoshino đã nhắc đến bạn trong một bình luận"]
+            },
+            bank: {
+                account: "Gojo Clan - Satoru",
+                balance: "¥ 9,999,999,999",
+                history: ["-¥ 150,000 (Mua bánh ngọt Kikufuku)", "+¥ 50,000,000 (Thưởng nhiệm vụ cấp S)"]
+            },
+            album: ["Kikufuku.jpg", "Lớp_học_2018.png", "Hoshino_Omie_Tài_Liệu_Bảo_Mật.pdf"]
+        },
+        omie: {
+            name: "Omie Hoshino's iPhone Custom Gold",
+            line: [
+                { name: "Cha (Kazuma)", msg: "Con gái cưng, đến trường mới nếu không thích cứ nói cha nhé!", time: "09:00" },
+                { name: "Anh Hai (Kaito)", msg: "Omie ơi! Anh mới gánh tội cho em vụ làm vỡ bình hoa của cha đó 😭", time: "08:45" },
+                { name: "Em Trai (Riku)", msg: "Chị ơi, thằng nào ở trường mới tán tỉnh chị cứ bảo em, em xử nó!", time: "07:30" },
+                { name: "Chị Dâu (Kaori)", msg: "Bé Muichiro đòi gặp cô Omie nè con~", time: "Hôm qua" }
+            ],
+            insta: {
+                user: "@omie_angel_hoshino",
+                posts: ["Tea time tại Khách sạn Hoshino Luxury ☕✨", "New uniform style 🎀"],
+                notifications: ["@riku_hoshino đã thích bài viết của bạn", "@kaito_hoshino đã bình luận: 'Em gái xinh nhất thế giới!'"]
+            },
+            bank: {
+                account: "Hoshino Group - Omie Personal",
+                balance: "¥ 2,500,000,000",
+                history: ["+¥ 10,000,000 (Tiền tiêu xài hàng tháng từ Cha)", "-¥ 1,200,000 (Order váy Haute Couture)"]
+            },
+            album: ["Selfie_Angel.png", "Gia_đình_Hoshino.jpg", "Bé_Muichiro.png"]
+        }
+    };
+
+    function toggleMenu() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function openPhone(owner) {
+        currentPhoneOwner = owner;
+        document.getElementById('dropdownMenu').style.display = 'none';
+        document.getElementById('phoneModal').style.display = 'flex';
+        document.getElementById('phoneOwner').innerText = phoneData[owner].name;
+        switchApp('line');
+    }
+
+    function closePhone() {
+        document.getElementById('phoneModal').style.display = 'none';
+    }
+
+    function switchApp(app) {
+        currentApp = app;
+        const buttons = document.querySelectorAll('.app-tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Highlight tab
+        event.target.classList.add('active');
+
+        const content = document.getElementById('phoneContent');
+        const data = phoneData[currentPhoneOwner];
+
+        if (app === 'line') {
+            let html = '<div class="notification">💬 Tin nhắn LINE mới nhất</div>';
+            data.line.forEach(item => {
+                html += `<div class="card">
+                    <strong>${item.name}</strong> <small style="float:right">${item.time}</small>
+                    <p style="margin-top:5px; color:#aaa; font-size:0.85rem">${item.msg}</p>
+                </div>`;
+            });
+            content.innerHTML = html;
+        } else if (app === 'insta') {
+            let html = `<div class="card"><strong>Tài khoản:</strong> ${data.insta.user}</div>`;
+            html += '<div style="margin: 10px 0; font-size:0.85rem; color:var(--gojo-blue)">Thông báo mới:</div>';
+            data.insta.notifications.forEach(n => {
+                html += `<div class="card" style="font-size:0.8rem">${n}</div>`;
+            });
+            content.innerHTML = html;
+        } else if (app === 'bank') {
+            content.innerHTML = `
+                <div class="card">
+                    <div>Tài khoản: ${data.bank.account}</div>
+                    <div class="bank-balance">${data.bank.balance}</div>
+                </div>
+                <div style="margin: 10px 0; font-size:0.85rem">Lịch sử giao dịch:</div>
+                ${data.bank.history.map(h => `<div class="card" style="font-size:0.8rem">${h}</div>`).join('')}
+            `;
+        } else if (app === 'album') {
+            let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">';
+            data.album.forEach(img => {
+                html += `<div class="card" style="text-align:center; padding:20px 5px; font-size:0.8rem">🖼️<br>${img}</div>`;
+            });
+            html += '</div>';
+            content.innerHTML = html;
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const chatArea = document.getElementById('chatArea');
+
+        // Add User Message (Omie)
+        const userMsgDiv = document.createElement('div');
+        userMsgDiv.className = 'msg msg-omie';
+        userMsgDiv.innerText = text;
+        chatArea.appendChild(userMsgDiv);
+
+        input.value = '';
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        // Auto Bot Response Simulation (Gojo / Narrator)
+        setTimeout(() => {
+            const gojoMsgDiv = document.createElement('div');
+            gojoMsgDiv.className = 'msg msg-gojo';
+            gojoMsgDiv.innerText = `Gojo Satoru hạ nhẹ kính mát xuống, đôi mắt Lục Nhãn lấp lánh nhìn Omie rồi mỉm cười trêu ghẹo:\n"Haha~ Ấn tượng đấy! Đúng là phong thái của tiểu thư tập đoàn Hoshino nhỉ? Lớp chúng ta lại có thêm một cô em sang chảnh rồi đây~"`;
+            chatArea.appendChild(gojoMsgDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }, 1200);
+    }
+</script>
+</body>
+</html>
